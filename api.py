@@ -24,6 +24,11 @@ def fetch_sheet():
 @app.route('/sheet/sync', methods=['POST'])
 def sync():
     sheet.sync()
+    
+    
+@app.route('/resource/get', methods=['GET'])
+def get_resource():
+    return jsonify(resources.get()), 200
 
 
 @app.route('/resource/update', methods=['POST'])
