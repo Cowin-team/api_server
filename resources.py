@@ -21,6 +21,19 @@ def init():
         SRC = json.loads(SRC)
 
 
+def get():
+    resources = {}
+
+    for city, resource_map in SRC.items():
+        if resource_map != {}:
+            resources[city] = []
+
+            for resource, _ in resource_map.items():
+                resources[city].append(resource)
+
+    return resources
+
+
 def update(city, resource, link):
     if city not in SRC:
         SRC[city] = {}
