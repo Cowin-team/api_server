@@ -53,4 +53,4 @@ def update_resource():
         return jsonify({'msg': 'failed', 'err': str(e)}), 500
 
 
-app.run()
+app.run(host='0.0.0.0', port=80)
