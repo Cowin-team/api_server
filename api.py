@@ -1,5 +1,6 @@
 import flask
 from flask import request, jsonify
+from flask_cors import CORS
 
 
 import sheet
@@ -7,7 +8,7 @@ import resources
 
 
 app = flask.Flask(__name__)
-app.config["DEBUG"] = True
+CORS(app)
 
 sheet.init()
 resources.init()
@@ -24,8 +25,8 @@ def fetch_sheet():
 @app.route('/sheet/sync', methods=['POST'])
 def sync():
     sheet.sync()
-    
-    
+
+
 @app.route('/resource/get', methods=['GET'])
 def get_resource():
     return jsonify(resources.get()), 200
