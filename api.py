@@ -1,12 +1,15 @@
 import flask
 from flask import request, jsonify
 from flask_cors import CORS
+from gevent.pywsgi import WSGIServer
+from gevent import monkey
 
 
 import sheet
 import resources
 
 
+monkey.patch_all()
 app = flask.Flask(__name__)
 CORS(app)
 
@@ -54,4 +57,5 @@ def update_resource():
         return jsonify({'msg': 'failed', 'err': str(e)}), 500
 
 
-app.run(host='0.0.0.0', port=80)
+http = WSGIServer(('0.0.0.0', 80), app.wsgi_app)
+http.serve_forever()
