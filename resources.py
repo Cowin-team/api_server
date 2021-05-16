@@ -13,10 +13,11 @@ def init():
     SRC = REDIS.get('resources')
 
     if SRC is None:
-        with open('./resources.json') as resource_file:
-            SRC = json.loads(resource_file.read())
-
-        REDIS.set('resources', json.dumps(SRC))
+        # with open('./resources.json') as resource_file:
+        #     SRC = json.loads(resource_file.read())
+        #
+        # REDIS.set('resources', json.dumps(SRC))
+        SRC = {}
     else:
         SRC = json.loads(SRC)
 
@@ -41,8 +42,8 @@ def update(city, resource, link):
     SRC[city][resource] = link
     REDIS.set('resources', json.dumps(SRC))
 
-    with open('./resources.json', 'w') as resource_file:
-        resource_file.write(json.dumps(SRC, indent=4))
+    # with open('./resources.json', 'w') as resource_file:
+    #     resource_file.write(json.dumps(SRC, indent=4))
 
 
 def get_sheet_link(city, resource):
