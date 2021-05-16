@@ -5,11 +5,12 @@ from gevent.pywsgi import WSGIServer
 from gevent import monkey
 
 
+monkey.patch_all(ssl=False)
+
 import sheet
 import resources
 
 
-monkey.patch_all()
 app = flask.Flask(__name__)
 CORS(app)
 
