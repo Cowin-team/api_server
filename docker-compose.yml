@@ -1,0 +1,42 @@
+version: '3.2'
+services:
+  app:
+    build: .
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dev
+    ports:
+      - 80:8081
+    volumes:
+      - app-source:/app
+    command: "python api.py"
+  postgres:
+    image: postgres:11.6-alpine
+    networks:
+      - dev
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    environment:
+      - "POSTGRES_PASSWORD=Szr+4pzXarBGBzBGMGffuA1MV1w"
+  redis:
+    image: registry.gitlab.com/thelifecompany/docker-redis:5.0.7_20200116
+    networks:
+      - dev
+
+networks:
+  dev:
+
+volumes:
+  pg-data:
+  es-data:
+  redis-cache-data:
+  app-source:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "${PWD}"
+
+

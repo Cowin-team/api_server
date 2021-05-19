@@ -58,5 +58,5 @@ def update_resource():
         return jsonify({'msg': 'failed', 'err': str(e)}), 500
 
 
-http = WSGIServer(('0.0.0.0', 80), app.wsgi_app)
+http = WSGIServer(('0.0.0.0', 8081), app.wsgi_app)
 http.serve_forever()

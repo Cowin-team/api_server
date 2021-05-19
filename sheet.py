@@ -18,8 +18,7 @@ DATA = '%s_%s_data'
 
 def init():
     global REDIS
-    REDIS = redis.Redis()
-
+    REDIS = redis.Redis(host='redis')
 
 def sync():
     pass

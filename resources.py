@@ -9,7 +9,7 @@ REDIS = None
 def init():
     global SRC, REDIS
 
-    REDIS = redis.Redis()
+    REDIS = redis.Redis(host='redis')
     SRC = REDIS.get('resources')
 
     if SRC is None:

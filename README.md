@@ -2,28 +2,42 @@
 
 ## Instructions to run API Server
 
+### Native installation
+
 1. Make sure to have Python3.
-2. Clone the repo and cd into it.  
+2. Clone the repo and cd into it.
     `git clone https://github.com/Cowin-team/api_server.git && cd api_server`
-3. Create a virtual environment to keep global python clean  
+3. Create a virtual environment to keep global python clean
     `python -m venv env`
-4. Activate the environment  
+4. Activate the environment
     `source env/bin/activate`
-5. Install the required packages  
+5. Install the required packages
     `pip install -r requirements.txt`
-6. Install redis  
-    Linux:  
-        `sudo apt-get install redis-server`  
-    Mac:  
-        `brew install redis  
+6. Install redis
+    Linux:
+        `sudo apt-get install redis-server`
+    Mac:
+        `brew install redis
         brew services start redis`
-7. Run the server  
+7. Run the server
     `python api.py`
-   
+
+### Installation with Docker
+
+* Install Docker and Docker-compose
+* Build the image
+  ```console
+  $ docker-compose build
+  ```
+* Run the app
+  ```console
+  $ docker-compose up
+  ```
+
 ## APIs
-1. API to fetch all the resources supported by the app  
-    URL: *http://35.223.206.45/resource/get*  
-    Method: GET  
+1. API to fetch all the resources supported by the app
+    URL: *http://35.223.206.45/resource/get*
+    Method: GET
     Response:
     ```
     {
@@ -52,10 +66,10 @@
         ],
         ......
     }
-2.  API to fetch the resource values   
-    Request URL: *http://35.223.206.45/sheet/fetch?city=chennai&resource=oxygen*  
-    Method: GET  
-    Response (same as "values" from google sheet apis): 
+2.  API to fetch the resource values
+    Request URL: *http://35.223.206.45/sheet/fetch?city=chennai&resource=oxygen*
+    Method: GET
+    Response (same as "values" from google sheet apis):
     ```
     [
         [
@@ -73,4 +87,4 @@
             "9444003856, 8778731935"
         ]....
     ]
-   
+
