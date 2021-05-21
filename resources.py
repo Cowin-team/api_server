@@ -74,6 +74,8 @@ def update(city, resource, link):
 
 
 def get_sheet_link(city, resource):
+    pull_data()
+
     if city not in SRC:
         return None
     if resource not in SRC[city]:
