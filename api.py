@@ -36,6 +36,11 @@ def get_resource():
     return jsonify(resources.get()), 200
 
 
+@app.route('/resource/get_coordinates', methods=['GET'])
+def get_coordinates():
+    return jsonify(resources.get_coordinates()), 200
+
+
 @app.route('/resource/update', methods=['POST'])
 def update_resource():
     try:

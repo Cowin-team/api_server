@@ -3,3 +3,5 @@ Flask-Cors==3.0.10
 redis==3.5.3
 requests==2.25.1
 gevent==21.1.2
+geopy==2.1.0
+nominatim==0.1
