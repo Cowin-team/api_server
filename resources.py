@@ -39,11 +39,13 @@ def get():
     return resources
 
 
-def get_coordinates():
+def get_details():
+    pull_data()
     return COORDINATES
 
 
 def update(city, resource, link):
+    global SRC, COORDINATES
     coordinates = GEOLOCATOR.geocode('%s,India' % city)
     pull_data()
 
@@ -55,7 +57,12 @@ def update(city, resource, link):
 
     SRC[city][resource] = link
 
-    COORDINATES[city] = {}
+    if 'resources' not in COORDINATES[city]:
+        COORDINATES[city]['resources'] = []
+
+    if resource not in COORDINATES[city]['resources']:
+        COORDINATES[city]['resources'].append(resource)
+
     COORDINATES[city]['lat'] = coordinates.latitude
     COORDINATES[city]['lng'] = coordinates.longitude
 
@@ -63,6 +70,7 @@ def update(city, resource, link):
     tokens = [token.strip() for token in tokens]
 
     COORDINATES[city]['state'] = tokens[-3]
+    COORDINATES[city]['country'] = tokens[-1]
 
     try:
         int(tokens[-2])
