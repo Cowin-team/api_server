@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 import sheet
 import resources
+import database as resource_store
 
 
 app = flask.Flask(__name__)
@@ -12,7 +13,45 @@ CORS(app)
 
 sheet.init()
 resources.init()
+#resource_store.init()
 
+@app.route('/data/fetch', methods=['GET'])
+def fetch_data():
+
+    resource = request.args.get('resource')
+
+    # expecting bounding coordinates as pt{i}=latitude,longitude (EX: pt1=12.1,98.01&pt2=14.1,73.94&...)
+    bounding_points = []
+    for i in range(4):
+        bounding_points.append(request.args.get(f'pt{i + 1}'))
+    bounding_points = filter(lambda x: x is not None, bounding_points)
+    bounding_points = map(lambda x: (float(x.split(',')[0]), float(x.split(',')[1])), bounding_points)
+    bounding_points = list(bounding_points)
+
+    data = resource_store.get(resource_name=resource, bounding_points=bounding_points)
+
+    return jsonify(data)
+
+
+# is it safe to expose this route? can someone give any sheet link and corrupt the data.
+@app.route('/data/upsert', methods=['POST'])
+def upsert_data():
+
+    try:
+        city = request.json['city']
+        resource_name = request.json['resource']
+        google_sheet_id = request.json['link']
+    except KeyError as err:
+        return jsonify({'msg': f'{str(err)} not provided'}), 401
+
+    try:
+        resource_info = resource_store.get_sheet_data(google_sheet_id, resource_store.API_KEY)
+    except Exception as err:
+        return f"Invalid link: {google_sheet_id}", 417
+
+    resource_store.upsert(city, resource_name, resource_info, google_sheet_id)
+    
+    return "Successfull"
 
 @app.route('/sheet/fetch', methods=['GET'])
 def fetch_sheet():
