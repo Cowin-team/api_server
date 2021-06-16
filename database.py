@@ -2,6 +2,7 @@ import requests
 import psycopg2
 from psycopg2.extras import execute_batch
 from functools import reduce
+from resources import get_resource_map
 
 
 DB_USER = "postgres"
@@ -35,7 +36,7 @@ def close_connection():
         PG_CONNECTION.close()
 
 
-def get(city=None, resource_name=None, bounding_points=[]):
+def get(city=None, resource_type=None, bounding_points=[]):
 
     try:
         cursor = get_connection().cursor() 
@@ -48,10 +49,10 @@ def get(city=None, resource_name=None, bounding_points=[]):
             conditions.append("city = %s")
             query_params += (city,)
 
-        if isinstance(resource_name, str) and resource_name.strip():
-            resource_name = resource_name.strip().lower()
-            conditions.append("resource = %s")
-            query_params += (resource_name,)
+        if isinstance(resource_type, str) and resource_type.strip():
+            resource_type = resource_type.strip().lower()
+            conditions.append("resource_type = %s")
+            query_params += (resource_type,)
 
         if isinstance(bounding_points, list) and bounding_points:
 
@@ -74,27 +75,36 @@ def get(city=None, resource_name=None, bounding_points=[]):
         cursor.close() 
 
 
-def upsert(city, resource_name, resources_info, google_sheet_id):
+def get_sheet_info(sheet_id):
+    resource_map = get_resource_map()
+    for city in resource_map:
+        for resource_type in resource_map[city]:
+            if resource_map[city][resource_type] == sheet_id:
+                return {"city": city, "resource_type": resource_type}
+
+    return {}
+
+def upsert(city, resource_type, resources_info, google_sheet_id):
 
     try:
 
         city = city.strip().lower()
-        resource_name = resource_name.strip().lower()
+        resource_type = resource_type.strip().lower()
 
         connection = get_connection() 
         cursor = connection.cursor() 
 
-        delete(city, resource_name=resource_name, cursor=cursor)
+        delete(city, resource_type=resource_type, cursor=cursor)
         
         database_values = []
-        insert_query = f"INSERT INTO {RESOURCE_TABLE_NAME} (city, resource, google_sheet_id, location, raw_obj) VALUES (%s, %s, %s, ST_MakePoint(%s, %s), %s)"
+        insert_query = f"INSERT INTO {RESOURCE_TABLE_NAME} (city, resource_type, google_sheet_id, location, raw_obj) VALUES (%s, %s, %s, ST_MakePoint(%s, %s), %s)"
         for resource_info in resources_info:
 
             latitude, longitude = get_lat_long(resource_info)
 
             database_values.append((
                 city,
-                resource_name,
+                resource_type,
                 google_sheet_id,
                 longitude,
                 latitude,
@@ -111,7 +121,7 @@ def upsert(city, resource_name, resources_info, google_sheet_id):
             cursor.close()
 
 
-def delete(city, resource_name=None, cursor=None):
+def delete(city, resource_type=None, cursor=None):
 
     try:
 
@@ -125,10 +135,10 @@ def delete(city, resource_name=None, cursor=None):
         delete_query = f"DELETE FROM {RESOURCE_TABLE_NAME} WHERE city = %s"
         query_params = (city,)
 
-        if resource_name is not None:
-            resource_name = resource_name.strip().lower()
-            delete_query += " AND resource = %s"
-            query_params += (resource_name,)
+        if resource_type is not None:
+            resource_type = resource_type.strip().lower()
+            delete_query += " AND resource_type = %s"
+            query_params += (resource_type,)
 
         local_cursor.execute(delete_query, query_params)
 

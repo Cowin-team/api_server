@@ -90,3 +90,7 @@ def get_sheet_link(city, resource):
         return None
 
     return SRC[city][resource]
+
+
+def get_resource_map():
+    return SRC

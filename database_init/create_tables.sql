@@ -1,7 +1,7 @@
 CREATE TABLE resources(
     id serial,
     city text,
-    resource text,
+    resource_type text,
     google_sheet_id text,
     location geometry,
     raw_obj text[]
