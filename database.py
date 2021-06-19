@@ -40,7 +40,7 @@ def get(city=None, resource_type=None, bounding_points=[]):
 
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            select_query = f"SELECT raw_obj FROM {RESOURCE_TABLE_NAME}"
+            select_query = f"SELECT resource_type, raw_obj FROM {RESOURCE_TABLE_NAME}"
             conditions = []
             query_params = ()
 
@@ -70,9 +70,17 @@ def get(city=None, resource_type=None, bounding_points=[]):
             cursor.execute(select_query, query_params)
             resources_info = cursor.fetchall()
 
-            resources_info = [x[0] for x in resources_info]
+            resp = {}
 
-            return resources_info
+            for row in resources_info:
+                res_type = row[0]
+
+                if res_type not in resp:
+                    resp[res_type] = []
+
+                resp[res_type].append(row[1])
+
+            return resp
 
 
 def get_sheet_info(sheet_id):
