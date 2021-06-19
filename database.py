@@ -38,41 +38,41 @@ def close_connection():
 
 def get(city=None, resource_type=None, bounding_points=[]):
 
-    try:
-        cursor = get_connection().cursor() 
-        select_query = f"SELECT raw_obj FROM {RESOURCE_TABLE_NAME}"
-        conditions = []
-        query_params = ()
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            select_query = f"SELECT raw_obj FROM {RESOURCE_TABLE_NAME}"
+            conditions = []
+            query_params = ()
 
-        if isinstance(city, str) and city.strip():
-            city = city.strip().lower()
-            conditions.append("city = %s")
-            query_params += (city,)
+            if isinstance(city, str) and city.strip():
+                city = city.strip().lower()
+                conditions.append("city = %s")
+                query_params += (city,)
 
-        if isinstance(resource_type, str) and resource_type.strip():
-            resource_type = resource_type.strip().lower()
-            conditions.append("resource_type = %s")
-            query_params += (resource_type,)
+            if isinstance(resource_type, str) and resource_type.strip():
+                resource_type = resource_type.strip().lower()
+                conditions.append("resource_type = %s")
+                query_params += (resource_type,)
 
-        if isinstance(bounding_points, list) and bounding_points:
+            if isinstance(bounding_points, list) and bounding_points:
 
-            conditions.append(
-                f"ST_CONTAINS(ST_ENVELOPE('LINESTRING({', '.join('%s %s' for _ in range(len(bounding_points)))})'), location)"
-            )
-            # conditions : [ ..., "ST_CONTAINS(ST_ENVELOPE('LINESTRING(%s %s, %s %s, ...)'))" ]
-            
-            query_params += reduce(lambda x, y: x+y, bounding_points)
+                conditions.append(
+                    f"ST_CONTAINS(ST_ENVELOPE('LINESTRING({', '.join('%s %s' for _ in range(len(bounding_points)))})'), location)"
+                )
+                # conditions : [ ..., "ST_CONTAINS(ST_ENVELOPE('LINESTRING(%s %s, %s %s, ...)'))" ]
 
-        if conditions:
-            select_query += " WHERE " + " AND ".join(conditions)
+                # merging bounding point tuples into query_params 
+                query_params += reduce(lambda x, y: x+y, bounding_points)
 
-        cursor.execute(select_query, query_params)
-        resources_info = cursor.fetchall()
+            if conditions:
+                select_query += " WHERE " + " AND ".join(conditions)
 
-        return resources_info
+            cursor.execute(select_query, query_params)
+            resources_info = cursor.fetchall()
 
-    finally:
-        cursor.close() 
+            resources_info = [x[0] for x in resources_info]
+
+            return resources_info
 
 
 def get_sheet_info(sheet_id):
