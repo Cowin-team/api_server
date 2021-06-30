@@ -75,10 +75,10 @@ def get_details():
 @app.route('/resource/update', methods=['POST'])
 def update_resource():
     try:
-        city = request.json.get('city').lower()
-        country = request.json.get('country').lower()
-        resource = request.json.get('resource').lower()
-        link = request.json.get('link')
+        city = request.json.get('city', None)
+        country = request.json.get('country', None)
+        resource = request.json.get('resource', None)
+        link = request.json.get('link', None)
 
         if not city:
             return jsonify({'msg': 'city not provided'}), 401
@@ -91,6 +91,10 @@ def update_resource():
 
         if not link:
             return jsonify({'msg': 'link not provided'}), 401
+
+        city = city.lower()
+        country = country.lower()
+        resource = resource.lower()
 
         resources.update(city, country, resource, link)
         return jsonify({'msg': 'success'}), 201
