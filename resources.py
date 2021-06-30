@@ -44,9 +44,9 @@ def get_details():
     return COORDINATES
 
 
-def update(city, resource, link):
+def update(city, country, resource, link):
     global SRC, COORDINATES
-    coordinates = GEOLOCATOR.geocode('%s,India' % city)
+    coordinates = GEOLOCATOR.geocode('%s,%s' % (city, country))
     pull_data()
 
     if city not in SRC:

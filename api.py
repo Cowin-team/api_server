@@ -76,11 +76,15 @@ def get_details():
 def update_resource():
     try:
         city = request.json.get('city').lower()
+        country = request.json.get('country').lower()
         resource = request.json.get('resource').lower()
         link = request.json.get('link')
 
         if not city:
             return jsonify({'msg': 'city not provided'}), 401
+
+        if not country:
+            return jsonify({'msg': 'country not provided'}), 401
 
         if not resource:
             return jsonify({'msg': 'resource not provided'}), 401
@@ -88,7 +92,7 @@ def update_resource():
         if not link:
             return jsonify({'msg': 'link not provided'}), 401
 
-        resources.update(city, resource, link)
+        resources.update(city, country, resource, link)
         return jsonify({'msg': 'success'}), 201
     except Exception as e:
         return jsonify({'msg': 'failed', 'err': str(e)}), 500
