@@ -66,16 +66,11 @@ def update(city, country, resource, link):
     COORDINATES[city]['lat'] = coordinates.latitude
     COORDINATES[city]['lng'] = coordinates.longitude
 
-    tokens = str(coordinates).split(',')
-    tokens = [token.strip() for token in tokens]
+    location = GEOLOCATOR.reverse('%s,%s' % (str(coordinates.latitude), str(coordinates.longitude)), language='en')
+    address = location.raw['address']
 
-    COORDINATES[city]['state'] = tokens[-3]
-    COORDINATES[city]['country'] = tokens[-1]
-
-    try:
-        int(tokens[-2])
-    except:
-        COORDINATES[city]['state'] = tokens[-2]
+    COORDINATES[city]['state'] = address['state']
+    COORDINATES[city]['country'] = address['country']
 
     REDIS.set('resources', json.dumps(SRC))
     REDIS.set('coordinates', json.dumps(COORDINATES))
