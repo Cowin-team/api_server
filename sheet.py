@@ -56,10 +56,33 @@ def get(city, resource):
 
     if resp.status_code == 200:
         values = resp.json()['values']
+        coordinate_list = []
+        final_values = []
+
+        for value in values:
+            coordinates = None
+
+            if len(value) == 0:
+                continue
+
+            if '' not in [value[2], value[3]]:
+                coordinates = (value[2], value[3])
+            elif value[4] != '' and '@' in value[4] and 'z' in value[4]:
+                link = value[4]
+                coordinate_string = link[link.index('@'):]
+                coordinate_string = coordinate_string[:coordinate_string.index('z')]
+                coordinate_tokens = coordinate_string.split(',')
+                coordinates = (coordinate_tokens[0], coordinate_tokens[1])
+            else:
+                final_values.append(value)
+
+            if coordinates is not None and coordinates not in coordinate_list:
+                final_values.append(value)
+                coordinate_list.append(coordinates)
 
         REDIS.set(last_updated_key, time.time())
-        REDIS.set(data_key, json.dumps(values))
+        REDIS.set(data_key, json.dumps(final_values))
 
-        return values, 200
+        return final_values, 200
 
     return {'msg': 'something went wrong'}, 500
